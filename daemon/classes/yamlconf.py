@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-#  yaml.py
+#  yamlconf.py
 #  
 #  Copyright 2015 Samir Chaouki <moebius.eye@gmail.com>
 #  
@@ -28,20 +28,50 @@ import yaml, sys
 class YamlConf(object):
     """  """
     
-    def __init__ (self, confdir='../conf/', tag='dev'):
-        """ Class initialiser """
-        
-        config = yaml.load(open(confdir+'example.yaml','rb').read())
+    def __init__ (self, role=None, confdir='../../conf/', tag='dev'):
+        """ Function doc
+    
+        @param role: [publish|subscribe], Mandatory. 
+        @param confdir: Path containing the yaml files. 
+        @param tag: Can be anything, prod, dev, dev1, etc. 
+            This is the first hash value of the yaml file. 
+        """
         try:
-            self.rawconfig = config[tag]
-        except KeyError:
-            logging.error("No configuration was found for tag [%s] " % tag )
-            exit(1)
-        self.setAccounts()
-        if not self.validateAccounts():
-            logging.error("Could not validate the account section. Dumping it.")
-            pprint(self.accounts)
-            exit(1)
+            self.role=str(role)
+        except TypeError:
+            logger.error("Could not cast the given role to a proper string. ")
+            return False
+        configs={}
+        try:
+            configs['default'] = yaml.load(open(confdir+'default.yaml','rb').read())
+        except FileNotFoundError:
+            pass
+        try:
+            configs[self.role] = yaml.load(open(confdir+self.role+'.yaml','rb').read())
+        except FileNotFoundError:
+            pass
+        try:
+            configs['override'] = yaml.load(open(confdir+'override.yaml','rb').read())
+        except FileNotFoundError:
+            pass
+        
+        for level in [ 'default', self.role, 'override' ]:
+            try:
+                print('--configs[%s]--' % level)
+                config=configs[level]
+                pprint(config)
+            except KeyError:
+                continue
+            try:
+                self.rawconfig = config[tag]
+            except KeyError:
+                logging.error("No configuration was found for tag [%s] " % tag )
+                exit(1)
+            self.setAccounts()
+            if not self.validateAccounts():
+                logging.error("Could not validate the account section. Dumping it.")
+                pprint(self.accounts)
+                exit(1)
     
     def validateAccounts(self):
         """ Function doc
@@ -84,7 +114,7 @@ class YamlConf(object):
             self.accounts.append(acc)
         # END
 try:
-    yamlconf=YamlConf(confdir='../conf/', tag='prod')
+    yamlconf=YamlConf(role='publish', confdir='../../conf/', tag='prod')
     print("---yamlconf.accounts---")
     pprint(yamlconf.accounts)
 except KeyError:
