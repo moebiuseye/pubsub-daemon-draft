@@ -1,0 +1,29 @@
+---
+# Read `COFINGURATION.md` for info about how to name this file. 
+prod:
+    accounts:
+        - 
+            jid: pub_sub@moeyeb.us/script_yaml_prod
+            password: pubsub
+            servers:
+                - pubsub.moeyeb.us
+            nodeprefix: '/home/moeyeb.us/'
+        - 
+            jid: pub_sub@chaouki.fr/script_yaml_prod
+            password: pubsub
+            nodeprefix: '/home/chaouki.fr/'
+    servers:
+        - pubsub.chaouki.fr
+        - pubsub.moeyeb.us
+    # If you want a common nodeprefix for all accounts, 
+    # Uncomment the following line. It overrides any previously 
+    # defined nodeprefix: 
+    #nodeprefix: '/home/mypublications/'
+dev:
+    accounts:
+        -
+            jid: pub_sub@localhost/script_yaml_dev
+            password: pubsub
+            servers:
+                - pubsub.localhost
+            nodeprefix: '/home/localhost/dev/'
